@@ -1,0 +1,1 @@
+Put the folders of product_img, review_img here!
