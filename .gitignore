@@ -2,3 +2,4 @@ __pycache__
 product_img/
 review_img/
 *.pth
+*.tflite

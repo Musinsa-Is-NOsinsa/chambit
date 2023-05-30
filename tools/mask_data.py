@@ -6,6 +6,7 @@ import numpy as np
 from segment_anything import SamPredictor, sam_model_registry
 
 from utils.mp_holistic import get_upper_landmarks
+from utils.mp_image_segmenter import segment_image
 
 
 def mask_data(image, masks):
@@ -20,6 +21,8 @@ def mask_data(image, masks):
     mask_image = cv2.cvtColor(mask_image, cv2.COLOR_BGR2GRAY)
 
     contours, _ = cv2.findContours(mask_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    if not contours:
+        return None
 
     contours = np.concatenate(contours)
 
@@ -57,20 +60,25 @@ def main():
                     input_point = np.array(upper_landmarks)
                     input_label = np.array([1] * len(upper_landmarks))
 
-                    masks, _, _ = predictor.predict(
+                    mask, _, _ = predictor.predict(
                         point_coords=input_point,
                         point_labels=input_label,
                         multimask_output=False,
                     )
 
-                    image = mask_data(image, masks)
+                else:
+                    mask = segment_image(image)
 
-                    prefix = "mask_"
-                    dir = os.path.dirname(prefix + filepath)
-                    if not os.path.exists(dir):
-                        os.makedirs(dir)
+                image = mask_data(image, mask)
+                if image is None:
+                    continue
 
-                    cv2.imwrite(prefix + filepath, image)
+                prefix = "mask_"
+                dir = os.path.dirname(prefix + filepath)
+                if not os.path.exists(dir):
+                    os.makedirs(dir)
+
+                cv2.imwrite(prefix + filepath, image)
 
     print("Done!")
 
