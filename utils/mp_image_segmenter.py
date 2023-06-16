@@ -1,11 +1,10 @@
-import cv2
 import mediapipe as mp
 import numpy as np
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 # Create the options that will be used for ImageSegmenter
-base_options = python.BaseOptions(model_asset_path="pretrained_models/mediapipe/selfie_multiclass_256x256.tflite")
+base_options = python.BaseOptions(model_asset_path="selfie_multiclass_256x256.tflite")
 options = vision.ImageSegmenterOptions(base_options=base_options, output_category_mask=True)
 
 # Create the image segmenter
